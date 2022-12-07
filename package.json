@@ -1,0 +1,24 @@
+{
+  "name": "connectors-ts",
+  "version": "0.0.1",
+  "description": "Connect any searchable data source to Elasticsearch to manage via Kibana.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Sander Philipse",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "^18.11.9",
+    "@typescript-eslint/eslint-plugin": "^5.44.0",
+    "@typescript-eslint/parser": "^5.44.0",
+    "eslint": "^8.28.0",
+    "eslint-config-prettier": "^8.5.0",
+    "eslint-plugin-prettier": "^4.2.1",
+    "typescript": "^4.9.3"
+  },
+  "dependencies": {
+    "@elastic/elasticsearch": "^8.5.0",
+    "cron-schedule": "^3.0.6"
+  }
+}
