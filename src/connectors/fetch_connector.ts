@@ -6,7 +6,7 @@
  */
 
 import { Client } from "@elastic/elasticsearch";
-import { CONNECTORS_INDEX } from "..";
+import { CONNECTORS_INDEX } from "../constants";
 import { Connector, ConnectorDocument } from "../connectors";
 import { OptimisticConcurrency } from "../utils/optimistic_concurrency";
 

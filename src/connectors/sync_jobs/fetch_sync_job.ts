@@ -1,5 +1,5 @@
 import { Client } from "@elastic/elasticsearch";
-import { CONNECTORS_JOBS_INDEX } from "../../index";
+import { CONNECTORS_JOBS_INDEX } from "../../constants";
 import { ConnectorSyncJob, ConnectorSyncJobDocument } from "../../connectors";
 
 export async function fetchSyncJob(

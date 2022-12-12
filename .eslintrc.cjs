@@ -26,4 +26,5 @@ module.exports = {
   rules: {
     "prettier/prettier": ["error"],
   },
+  ignorePatterns: ["dist", "node_modules", "target", "**/*.js"],
 };

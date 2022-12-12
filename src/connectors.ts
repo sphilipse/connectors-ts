@@ -149,7 +149,9 @@ export interface ConnectorSyncJob {
     pipeline: IngestPipelineParams | null;
     service_type: string;
   };
+  count: number | null;
   created_at: string;
+  cursor: number | null;
   deleted_document_count: number;
   error: string | null;
   id: string;
@@ -170,4 +172,14 @@ export interface NativeConnector {
   features: Connector["features"];
   name: string;
   serviceType: string;
+}
+export interface Counts {
+  deleted_document_count: 0;
+  indexed_document_count: 0;
+  indexed_document_volume: 0;
+}
+
+export interface JobResponse extends Counts {
+  error?: string;
+  status: SyncStatus;
 }

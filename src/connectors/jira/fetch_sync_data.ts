@@ -17,7 +17,7 @@ export async function fetchSyncData(
   const auth = Buffer.from(
     `${config["username"].value}:${config["api_key"].value}`
   ).toString("base64");
-  const url = `${config["host_name"].value}/rest/api/3/search?maxResults=5&startAt=${cursor}`;
+  const url = `${config["host_name"].value}/rest/api/3/search?maxResults=100&startAt=${cursor}`;
   const result = await fetch(url, {
     credentials: "include",
     headers: {

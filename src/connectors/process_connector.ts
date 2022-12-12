@@ -1,5 +1,5 @@
 import { Client } from "@elastic/elasticsearch";
-import { CONNECTORS_INDEX } from "..";
+import { CONNECTORS_INDEX } from "../constants";
 import { Connector, ConnectorStatus } from "../connectors";
 import { ConnectorDefinition } from "./connector_definitions";
 
@@ -20,7 +20,11 @@ export async function processConnectorChanges(
         index: CONNECTORS_INDEX,
       });
     } else {
-      // TODO: logic for failed configuration
+      await client.update({
+        doc: { error: "Invalid configuration", status: ConnectorStatus.ERROR },
+        id: connector.id,
+        index: CONNECTORS_INDEX,
+      });
     }
   }
 }

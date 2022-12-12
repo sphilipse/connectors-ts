@@ -1,5 +1,5 @@
 import { Client } from "@elastic/elasticsearch";
-import { CONNECTORS_INDEX } from "..";
+import { CONNECTORS_INDEX } from "../constants";
 import { Connector } from "../connectors";
 
 export async function checkIn(client: Client, connector: Connector) {

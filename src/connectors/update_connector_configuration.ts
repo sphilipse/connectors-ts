@@ -7,7 +7,7 @@
 
 import { Client } from "@elastic/elasticsearch";
 import { isDeepEqual } from "../utils/deep_equal";
-import { CONNECTORS_INDEX } from "..";
+import { CONNECTORS_INDEX } from "../constants";
 import {
   Connector,
   ConnectorConfiguration,

@@ -13,30 +13,14 @@ import { fetchConnectorById } from "./connectors/fetch_connector";
 import { updateConnectorConfiguration } from "./connectors/update_connector_configuration";
 import { CONNECTOR_DEFINITIONS } from "./connectors/connector_definitions";
 import { processConnectorChanges } from "./connectors/process_connector";
-import { executeSync } from "./connectors/execute_sync";
-import { addSyncJob } from "./connectors/sync_jobs/add_sync_job";
-import { checkSyncJobs } from "./connectors/sync_jobs/check_sync_jobs";
-
-export const CONNECTORS_INDEX = ".elastic-connectors";
-export const CURRENT_CONNECTORS_INDEX = ".elastic-connectors-v1";
-export const CONNECTORS_JOBS_INDEX = ".elastic-connectors-sync-jobs";
-export const CONNECTORS_VERSION = 1;
-export const CRAWLERS_INDEX = ".ent-search-actastic-crawler2_configurations_v2";
-export const ANALYTICS_COLLECTIONS_INDEX = ".elastic-analytics-collections";
-export const ANALYTICS_VERSION = "1";
-
-const apiKey = "T2JqZXZZUUJOV2NzR2YyU0FiTUs6RG9DRXdfUkFSaTZ5UkFUZWwwbHEzQQ==";
-const connectorId = "N7jdvYQBNWcsGf2S47NX";
+import { syncJobTask } from "./connectors/sync_jobs/sync_job_task";
+import { checkConnectorTask } from "./connectors/check_connector_task";
 
 const client = new Client({
-  auth: { apiKey },
-  node: "http://localhost:9200",
+  auth: { apiKey: "apiKey" },
+  node: "URL",
   tls: { rejectUnauthorized: false },
 });
-
-const jiraApiToken = "O45wwBD6SgO8cmzYtTXE8E86";
-const jiraUser = "workplace-search@elastic.co";
-const hostname = "https://workplace-search.atlassian.net";
 
 export interface Timers {
   checkConnector?: NodeJS.Timer;
@@ -46,8 +30,9 @@ export interface Timers {
 }
 
 const activeTimers: Timers = {};
+let connectorCheckInProgress = false;
 let connectorCache: Connector;
-fetchConnectorById(client, connectorId)
+fetchConnectorById(client, "connectorId")
   .then(async (newConnector) => {
     if (!newConnector.value) throw new Error("Connector not found");
     connectorCache = newConnector.value;
@@ -76,33 +61,27 @@ fetchConnectorById(client, connectorId)
     );
 
     activeTimers.checkConnector = setInterval(async () => {
-      const newConnector = await fetchConnectorById(client, connectorCache.id);
-      const changes = getChanges(connectorCache, newConnector.value);
-      await processConnectorChanges(
-        client,
-        connectorCache,
-        changes,
-        connectorDefinition
-      );
-      if (Object.keys(changes).length) {
-        connectorCache = newConnector.value;
-      }
-
-      if (connectorCache.sync_now) {
-        await addSyncJob(client, connectorCache, true);
-        client.update({
-          index: CONNECTORS_INDEX,
-          doc: { sync_now: false },
-          id: connectorCache.id,
-        });
+      if (!connectorCheckInProgress) {
+        try {
+          connectorCheckInProgress = true;
+          const newConnector = await checkConnectorTask(
+            client,
+            connectorCache,
+            connectorDefinition
+          );
+          connectorCache = newConnector;
+          connectorCheckInProgress = false;
+        } catch (error) {
+          console.error(error);
+          connectorCheckInProgress = false;
+        }
       }
     }, 1000);
-    activeTimers.checkSyncJobs = setInterval(async () => {
-      const syncJob = await checkSyncJobs(client, connectorId);
-      if (syncJob) {
-        await executeSync(client, syncJob, connectorDefinition.fetchSyncData);
-      }
-    }, 1000);
+    activeTimers.checkSyncJobs = setInterval(
+      async () =>
+        syncJobTask(client, connectorId, connectorDefinition.fetchSyncData),
+      1000
+    );
   })
   .catch((error) =>
     console.error(`Could not fetch connector with id ${connectorId}`, error)

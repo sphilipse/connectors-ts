@@ -4,14 +4,21 @@
   "description": "Connect any searchable data source to Elasticsearch to manage via Kibana.",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "esbuild src/index.ts --bundle --outfile=dist/out.js --platform=node",
+    "build-mockserver": "esbuild src/test-servers/mock-jira.ts --bundle --outfile=dist/mockserver.js --platform=node",
+    "build-mocklambda": "esbuild src/test-servers/mock-serverless.ts --bundle --outfile=dist/mockserverless.js --platform=node",
+    "build-producer-lambda": "esbuild src/lambda/producer-handler.ts --bundle --outfile=dist/producer.js --platform=node",
+    "build-consumer-lambda": "esbuild src/lambda/consumer-handler.ts --bundle --outfile=dist/consumer.js --platform=node"
   },
   "author": "Sander Philipse",
   "license": "ISC",
   "devDependencies": {
+    "@types/aws-lambda": "^8.10.109",
     "@types/node": "^18.11.9",
     "@typescript-eslint/eslint-plugin": "^5.44.0",
     "@typescript-eslint/parser": "^5.44.0",
+    "aws-lambda": "^1.0.7",
+    "esbuild": "^0.16.1",
     "eslint": "^8.28.0",
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-prettier": "^4.2.1",
